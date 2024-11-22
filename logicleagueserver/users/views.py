@@ -12,7 +12,6 @@ class RegisterView(APIView):
     def post(self,request):
         # print(request.data)
         serializer = RegisterSerializer(data=request.data)
-        print(serializer)
         if serializer.is_valid():
             LogicLeagueUser = serializer.save()
             print(LogicLeagueUser)
@@ -23,6 +22,7 @@ class RegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
+        print("agya bhia")
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
@@ -43,4 +43,4 @@ class LoginView(APIView):
 class getName(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
-        return Response({"msg":"haa bhia sab mastt"},status=status.HTTP_200_OK)
+        return Response({"msg":"Welcome to home page"},status=status.HTTP_200_OK)

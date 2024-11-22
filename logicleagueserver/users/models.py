@@ -56,3 +56,6 @@ class LogicLeagueUser(AbstractBaseUser):
     def has_module_perms(self, app_label):
         # Override to allow for module permission checks
         return self.is_admin
+
+
+#user Education models 

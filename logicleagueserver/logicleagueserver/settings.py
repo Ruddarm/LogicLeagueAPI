@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,8 @@ SECRET_KEY = 'django-insecure-b&tid39w@0_0lp$=t7t-$0!%lfi9&%uolcec3=ivp)19#fho&l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['logicleagueapi.onrender.com']
+ALLOWED_HOSTS = ['logicleagueapi.onrender.com'
+                 ,'127.0.0.1']
 
 
 # Application definition
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'rest_framework_simplejwt',
-
+    'corsheaders'
 ]
 
 REST_FRAMEWORK={
@@ -61,6 +63,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware'
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
 
 ROOT_URLCONF = 'logicleagueserver.urls'
@@ -80,6 +89,15 @@ TEMPLATES = [
         },
     },
 ]
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60*24),  # Short-lived access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Long-lived refresh token
+    'ROTATE_REFRESH_TOKENS': True,                  # Issue new refresh token when refreshed
+    'BLACKLIST_AFTER_ROTATION': True,               # Blacklist old refresh tokens
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 WSGI_APPLICATION = 'logicleagueserver.wsgi.application'
 AUTH_USER_MODEL = 'users.LogicLeagueUser'
@@ -137,3 +155,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
