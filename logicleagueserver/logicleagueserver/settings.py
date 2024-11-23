@@ -130,6 +130,7 @@ AUTH_USER_MODEL = 'users.LogicLeagueUser'
 #         }
 #     }
 # }
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_CLIENT_ID')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET =os.getenv("GOOGLE_CLIENT_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
@@ -144,10 +145,21 @@ LOGOUT_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 import dj_database_url
 
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
+#     )
+# }
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'logicleague',       
+        'USER': "ruddarm",           # Replace with your database username
+        'PASSWORD': "ruddarmgoogle4234",       # Replace with your database password
+        'HOST': '35.200.181.214',  # Replace with your instance's Public IP address
+        'PORT': '5432',                    # Default PostgreSQL port
+    }
 }
 
 
