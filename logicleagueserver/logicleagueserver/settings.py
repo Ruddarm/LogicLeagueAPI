@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +44,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'rest_framework_simplejwt',
-    'corsheaders'
+    'corsheaders',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth.registration',
+    'rest_framework.authtoken',
+    
+
 ]
 
 REST_FRAMEWORK={
@@ -64,7 +74,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware'
+    'django.middleware.common.CommonMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  
 ]
 
 
@@ -98,9 +109,32 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,               # Blacklist old refresh tokens
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 WSGI_APPLICATION = 'logicleagueserver.wsgi.application'
 AUTH_USER_MODEL = 'users.LogicLeagueUser'
+
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': "",
+#             'secret': "",
+#             'key': ''
+#         }
+#     }
+# }
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '397654468073-qhsjsins0r3hp8e4g5ipu0p38b0csfiq.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+
+
+LOGIN_REDIRECT_URL = '/'  # Redirect after successful login
+LOGOUT_REDIRECT_URL = '/'
+
 
 
 # Database
@@ -145,6 +179,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+SITE_ID = 1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
