@@ -13,8 +13,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+import os
+from dotenv import load_dotenv
 
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -127,8 +130,8 @@ AUTH_USER_MODEL = 'users.LogicLeagueUser'
 #         }
 #     }
 # }
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '397654468073-qhsjsins0r3hp8e4g5ipu0p38b0csfiq.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_CLIENT_ID')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET =os.getenv("GOOGLE_CLIENT_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 
 

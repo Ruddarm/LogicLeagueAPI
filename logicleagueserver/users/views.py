@@ -56,7 +56,6 @@ class GoogleLogin(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
         access_token = request.data.get("token")
-        print(access_token)
         if not access_token:
             return Response({"Error":"Token not provided"},status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -65,7 +64,6 @@ class GoogleLogin(APIView):
             if user_info_response.status_code != 200:
                 return Response({"Error": "Failed to fetch user info from Google"}, status=status.HTTP_400_BAD_REQUEST)
             user_info = user_info_response.json()
-            print(user_info)
             email = user_info["email"]
             name = user_info["name"]
             if not email:
