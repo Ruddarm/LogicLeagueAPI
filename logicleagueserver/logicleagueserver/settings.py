@@ -30,10 +30,9 @@ SECRET_KEY = 'django-insecure-b&tid39w@0_0lp$=t7t-$0!%lfi9&%uolcec3=ivp)19#fho&l
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['35.200.235.194','logicleagueapi.onrender.com'
-                 ,'127.0.0.1']
-
+ALLOWED_HOSTS = ["*"]
+# '35.200.235.194','logicleagueapi.onrender.com'
+                #  ,'127.0.0.1'
 
 # Application definition
 
