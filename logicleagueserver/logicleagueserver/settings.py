@@ -84,6 +84,9 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://logicleague.netlify.app"
+    "https://logicleague.xyz",
+    "https://www.logicleague.xyz",
+
 ]
 
 ROOT_URLCONF = 'logicleagueserver.urls'
