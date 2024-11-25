@@ -10,7 +10,6 @@ class Challenges(models.Model):
     description = models.TextField(null=True)
     inputformat = models.TextField(null=True);
     outputformat = models.TextField(null=True)
-    tags = [models.CharField(max_length=150 , null=True)]
     LEVEL_CHOICES = [("Easy", "Easy"),
         ("Medium", "Medium"),
         ("Hard", "Hard"),]
@@ -18,8 +17,6 @@ class Challenges(models.Model):
     level = models.CharField(max_length=10,choices=LEVEL_CHOICES,default="Easy")
     isPublic = models.BooleanField(default=True)
     createdBy = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE,related_name="Challenges")
-    
-    
     def __str__(self):
         return self.name
 class Solution:

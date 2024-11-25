@@ -5,9 +5,12 @@ class CreateChalllengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Challenges
         fields = "__all__"
-        read_only_fields=[]
+        extra_kwargs = {
+            "createdBy": {"read_only": True},  # Make `createdBy` read-only
+        }
+
         
-    def create(self,validChallenge):
+    def create(self,validChallenge,user):
         print(validChallenge)
-        return Challenges.objects.create(**validChallenge)
+        return Challenges.objects.create(createdBy=user,**validChallenge)
         
