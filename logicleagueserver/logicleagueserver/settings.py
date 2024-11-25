@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
+    'challenges'
     
 
 ]
@@ -83,7 +84,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://logicleague.netlify.app"
+    "https://logicleague.netlify.app",
     "https://logicleague.xyz",
     "https://www.logicleague.xyz",
 
@@ -146,7 +147,6 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-import dj_database_url
 
 # DATABASES = {
 #     'default': dj_database_url.config(
