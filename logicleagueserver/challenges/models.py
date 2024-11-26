@@ -26,9 +26,10 @@ class Challenges(models.Model):
         return self.name
 class TestCase(models.Model):
     testCaseID = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
-    ifnput = models.TextField(null=False)
+    input = models.TextField(null=False)
     output = models.TextField(null=False)
     desc =  models.TextField(null=True)
+    ishiden = models.BooleanField(default=True)
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)    
 
 class Solution(models.Model):
@@ -40,3 +41,4 @@ class Solution(models.Model):
     space = models.CharField(null=True)
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)
     submitedBy = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
