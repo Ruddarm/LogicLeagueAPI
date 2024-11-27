@@ -15,8 +15,7 @@ from datetime import timedelta
 import os
 import os
 from dotenv import load_dotenv
-
-
+import dj_database_url
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
+    'challenges'
     
 
 ]
@@ -83,7 +83,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://logicleague.netlify.app"
+    "https://logicleague.netlify.app",
     "https://logicleague.xyz",
     "https://www.logicleague.xyz",
 
@@ -146,24 +146,23 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-import dj_database_url
-
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
-#     )
-# }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'logicleague',       
-        'USER': "ruddarm",           # Replace with your database username
-        'PASSWORD': "ruddarmgoogle4234",       # Replace with your database password
-        'HOST': '35.200.181.214',  # Replace with your instance's Public IP address
-        'PORT': '5432',                    # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
+    )
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'logicleague',       
+#         'USER': "ruddarm",           # Replace with your database username
+#         'PASSWORD': "ruddarmgoogle4234",       # Replace with your database password
+#         'HOST': '35.200.181.214',  # Replace with your instance's Public IP address
+#         'PORT': '5432',                    # Default PostgreSQL port
+#     }
+# }
 
 
 

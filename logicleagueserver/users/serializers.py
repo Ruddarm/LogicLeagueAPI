@@ -2,6 +2,9 @@ from rest_framework import serializers
 from .models import LogicLeagueUser
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
+from rest_framework.exceptions import AuthenticationFailed
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,3 +41,8 @@ class LoginSerializer(serializers.ModelSerializer):
             "refresh":str(refresh),
             "access":str(refresh.access_token),
         }
+    def decode_token(self,request):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "): 
+            raise AuthenticationFailed("Invalid Authenication")
+        
