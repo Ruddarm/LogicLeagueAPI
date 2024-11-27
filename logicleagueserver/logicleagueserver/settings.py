@@ -148,22 +148,22 @@ LOGOUT_REDIRECT_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
-#     )
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'logicleague',       
-        'USER': "ruddarm",           # Replace with your database username
-        'PASSWORD': "ruddarmgoogle4234",       # Replace with your database password
-        'HOST': '35.200.181.214',  # Replace with your instance's Public IP address
-        'PORT': '5432',                    # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
+    )
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'logicleague',       
+#         'USER': "ruddarm",           # Replace with your database username
+#         'PASSWORD': "ruddarmgoogle4234",       # Replace with your database password
+#         'HOST': '35.200.181.214',  # Replace with your instance's Public IP address
+#         'PORT': '5432',                    # Default PostgreSQL port
+#     }
+# }
 
 
 

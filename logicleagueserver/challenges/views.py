@@ -10,7 +10,7 @@ from .serializers import CreateChalllengeSerializer
 
 class ChallengeCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+    def post(self,request,*args,**kwargs):
         user = request.user
         print(user.id)
         logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
@@ -23,3 +23,13 @@ class ChallengeCreateView(APIView):
             return Response({"Msg":"working"},status=status.HTTP_200_OK)
         else:
             return Response({ "msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class testCaseCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,*args,**kwargs):
+        user = request.user;
+        ChallengeId = request.data["challengeID"]
+        challenge = get_object_or_404(Challenges,id=ChallengeId)
+        print(challenge)
+    
