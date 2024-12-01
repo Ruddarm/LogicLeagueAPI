@@ -66,6 +66,11 @@ REST_FRAMEWORK={
     ],
 
 }
+JWT_AUTH_COOKIE = 'access_token'  # Cookie name for JWT token
+JWT_AUTH_COOKIE_SECURE = False  # Set to True in production with HTTPS
+JWT_AUTH_COOKIE_SAMESITE = 'None'  # Allow cross-origin cookie access
+JWT_AUTH_COOKIE_HTTPONLY = True  
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,16 +83,33 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'allauth.account.middleware.AccountMiddleware',  
+    'logicleagueserver.middleware.PrintRequestHeadersMiddleware',
+    
 ]
-
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://logicleague.netlify.app",
     "https://logicleague.xyz",
     "https://www.logicleague.xyz",
+    "http://127.0.0.1:3000",
 
 ]
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+
+]
+
 
 ROOT_URLCONF = 'logicleagueserver.urls'
 
@@ -207,4 +229,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
