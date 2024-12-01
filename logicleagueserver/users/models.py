@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 
 class UserManager(BaseUserManager):
     def create_user(self, userobj):
-        print(f"creating {userobj}")
         # Ensure that userobj is a dictionary and the necessary fields exist
         username = userobj.get('username')
         email = userobj.get('email')

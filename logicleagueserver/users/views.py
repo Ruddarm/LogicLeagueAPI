@@ -6,12 +6,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import LogicLeagueUser
 from .serializers import RegisterSerializer,UserSerializer,LoginSerializer
 from dj_rest_auth.registration.views import SocialLoginView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from google.oauth2 import id_token
 import requests
 
 
-
-#7428713838
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -33,22 +33,39 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             tokens = serializer.get_token(user)
-            return Response({
-                "messagse":"Login Sucess full",
-                "tokens":tokens,
-                "user":
-                {
+            response = Response({
+                "messagse":"Login Success full",
+                "user":{
                     "id":user.id,
                     "username":user.username,
                     "email":user.email,   
-                },
-            },
-            status=status.HTTP_200_OK)
+                }},
+                                status=status.HTTP_200_OK)
+            response.set_cookie(
+                key="access_token",
+                value=str(tokens["access"]),
+                httponly=True,
+                secure=False ,
+                samesite="Lax",
+                max_age=7*24*60*60*1000
+            )
+            response.set_cookie(
+                key="refresh_token",
+                value=str(tokens["refresh"]),
+                httponly=True,
+                secure=False,  # Set to True in production with HTTPS
+                samesite="Lax",
+                max_age=7*24*60*60*1000
+            )
+            return response;
+                
         else:
             return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
 class getName(APIView):
+    authentication_classes= [JWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request):
+        print(request.COOKIES)
         return Response({"msg":"Welcome to home page"},status=status.HTTP_200_OK)
     
 
@@ -78,17 +95,40 @@ class GoogleLogin(APIView):
                     "refresh":str(refresh),
                     "access":str(refresh.access_token),
             }
-            return Response({
-                "messagse":"Login Sucess full",
-                "tokens":tokens,
-                "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                },
-            })
+            response = Response({
+                "messagse":"Login Success full",
+                "user":{
+                    "id":user.id,
+                    "username":user.username,
+                    "email":user.email,   
+                }},
+                                status=status.HTTP_200_OK)
+            response.set_cookie(
+                key="access_token",
+                value=str(tokens["access"]),
+                httponly=True,
+                secure=False ,
+                samesite="Lax",
+                max_age=7*24*60*60*1000
+            )
+            response.set_cookie(
+                key="refresh_token",
+                value=str(tokens["refresh"]),
+                httponly=True,
+                secure=False,  # Set to True in production with HTTPS
+                samesite="Lax",
+                max_age=7*24*60*60*1000
+            )
+            return response;
         except ValueError:
             return Response({"error": "Invalid Token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
+class LogoutView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self, request):
+        response = Response({"message": "Logged out successfully!"})
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+        return response
