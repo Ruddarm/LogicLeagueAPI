@@ -7,7 +7,6 @@ from .models import LogicLeagueUser
 from .serializers import RegisterSerializer,UserSerializer,LoginSerializer
 from dj_rest_auth.registration.views import SocialLoginView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
 from google.oauth2 import id_token
 import requests
 
