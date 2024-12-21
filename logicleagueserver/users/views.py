@@ -19,15 +19,15 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             LogicLeagueUser = serializer.save()
-            print(LogicLeagueUser)
+            # print(LogicLeagueUser)
             return Response({"message":"done dona done "},status=status.HTTP_201_CREATED)
-        else:
-            print("not valid")
+        # else:
+            # print("not valid")
         return Response({"msg":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
-        print(request.data);
+        # print(request.data);
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
@@ -61,13 +61,16 @@ class LoginView(APIView):
         else:
             return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
 class getName(APIView):
-    authentication_classes= [JWTAuthentication]
+    # authentication_classes= [JWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request):
-        print(request.COOKIES)
+        # print(request.COOKIES)
         return Response({"msg":"Welcome to home page"},status=status.HTTP_200_OK)
-    
-
+class checkAuth(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        return Response(status=status.HTTP_200_OK)          
+            
 class GoogleLogin(APIView):
     permission_classes = [AllowAny]
     def post(self,request):
@@ -127,7 +130,7 @@ class GoogleLogin(APIView):
 class LogoutView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self, request):
-        response = Response({"message": "Logged out successfully!"})
+        response = Response({"message": "Logged out successfully!"},status=status.HTTP_200_OK)
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
         return response

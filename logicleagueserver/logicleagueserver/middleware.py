@@ -19,8 +19,11 @@ class PrintRequestHeadersMiddleware:
                 user,_ = self.authenticator.authenticate(request)
                 request.user = user  # Attach user to request
             except AuthenticationFailed as e:
-                
-                raise AuthenticationFailed(f'Invalid or expired token: {str(e)}')
+                print("err")
+                response = self.get_response(request)
+                response.delete_cookie("access_token")
+                response.delete_cookie("refresh_token")
+                return response
 
         response = self.get_response(request)
         return response

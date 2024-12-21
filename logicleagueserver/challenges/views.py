@@ -33,3 +33,8 @@ class testCaseCreateView(APIView):
         challenge = get_object_or_404(Challenges,id=ChallengeId)
         print(challenge)
     
+class SolutionHandel(APIView):
+    permission_classes=[IsAuthenticated];
+    def post(self,request,*args,**kwargs):
+        user = request.user;
+        print(request.body)

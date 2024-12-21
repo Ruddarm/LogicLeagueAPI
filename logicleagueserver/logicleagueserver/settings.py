@@ -171,7 +171,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgresql://logicleague_user:plTlaQRtQulvaVLh9u38jjDURjOFgqhM@dpg-csuuef56l47c7382n0mg-a.oregon-postgres.render.com/logicleague"
+        default="postgresql://ruddarm:XSDXMYcSR1NZgv2bOXgIH2iZsXXWbVmv@dpg-ctjggojqf0us739c16sg-a.oregon-postgres.render.com/logicleague_3m49"
     )
 }
 
