@@ -52,8 +52,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
-    'challenges'
-    
+    'challenges',
+    'docker'
 
 ]
 

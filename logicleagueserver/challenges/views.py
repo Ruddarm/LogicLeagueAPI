@@ -7,7 +7,10 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import CreateChalllengeSerializer
+import docker
+import os
 
+client = docker.from_env()
 class ChallengeCreateView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,*args,**kwargs):
@@ -38,3 +41,5 @@ class SolutionHandel(APIView):
     def post(self,request,*args,**kwargs):
         user = request.user;
         print(request.body)
+        print("got code")
+        return Response(status=status.HTTP_200_OK)

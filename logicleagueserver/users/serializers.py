@@ -29,7 +29,6 @@ class LoginSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         email = attrs['email']
         password = attrs.get('password')
-        
         user = authenticate(email=email,password=password)
         if not user:
             raise serializers.ValidationError("Invalid email or password")
