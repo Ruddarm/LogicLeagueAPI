@@ -42,3 +42,4 @@ class Solution(models.Model):
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)
     submitedBy = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
+    
