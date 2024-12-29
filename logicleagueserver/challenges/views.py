@@ -4,43 +4,82 @@ import io
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from users.models import LogicLeagueUser
-from .models import Challenges;
+from .models import Challenges,TestCase
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import CreateChalllengeSerializer
+from .serializers import CreateChalllengeSerializer,TestCaseSerializer
 import docker
 from .Containerpool import  container_pool
 import os
 from  .CodeExecution import run_code
 
-# client = docker.from_env()
-
-# client = docker.from_env()
 class ChallengeCreateView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,*args,**kwargs):
         user = request.user
         print(user.id)
+        print(request.data["ChallengeState"])
         logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
-        print(logicLeagueUser)
         # request.data["createdBy"]=logicLeagueUser.id; 
-        serializer = CreateChalllengeSerializer(data=request.data)
+        serializer = CreateChalllengeSerializer(data=request.data["ChallengeState"])
         if serializer.is_valid():
-            # print(serializer)
-            serializer.create(serializer.data,logicLeagueUser)
-            return Response({"Msg":"working"},status=status.HTTP_200_OK)
+            new_challenge =  serializer.create(serializer.data,logicLeagueUser)
+            return Response({"Msg":"Challenge Created Sucessfully","id":new_challenge.challengeID},status=status.HTTP_200_OK)
         else:
             return Response({ "msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request,*args,**kwargs):
+        pass
+    
+class Challenge(APIView):
+    permission_classes =[AllowAny]
+    def post():
+        pass
+    def get(self,request,challengeID,*args,**kwargs):
+        # a6401008-75a9-4beb-a3c6-d98b290f088d
+        challenge = get_object_or_404(Challenges,challengeID=challengeID)
+        return Response({"challenge":{"challengeName":challenge.challengeName,
+                                      "challengeDesc":challenge.challengeDesc,
+                                      "challengeLevel":challenge.challengeLevel,
+                                      "problemStatement":challenge.problemStatement,
+                                      "inputFormat":challenge.inputFormat,
+                                      "outputFormat":challenge.outputFormat,
+                                      "constraints":challenge.constraints,
+                                      }},status=status.HTTP_200_OK)    
+    def put(self,request,challengeID,*args,**kwargs):
+        data =  request.data["ChallengeState"];
+        challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)        
+        if challenge_instance:
+            print(request.data["ChallengeState"])
+            challengeSerializer = CreateChalllengeSerializer(challenge_instance ,data=request.data["ChallengeState"])
+            if(challengeSerializer.is_valid()):
+                challengeSerializer.save()
+                return Response({"msg":"Updated Sucessfully"},status=status.HTTP_200_OK )
+        return Response({"msg":"challengeSerializer"},status=status.HTTP_400_BAD_REQUEST)
         
-        
-class testCaseCreateView(APIView):
+class testCaseView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,*args,**kwargs):
-        user = request.user;
-        ChallengeId = request.data["challengeID"]
-        challenge = get_object_or_404(Challenges,id=ChallengeId)
-        print(challenge)
+        serializer = TestCaseSerializer(data=request.data.get('testCase', {}))
+        if serializer.is_valid():
+            test_case = serializer.save()
+            return Response({
+                "msg": "Test Case Created Successfully",
+                "testCaseID": test_case.testCaseID
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "errors": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request,challengeID,*args,**kwargs):
+        if challengeID:
+            test_cases = TestCase.objects.filter(challengeID__challengeID = challengeID)
+            data = [{"testCaseID": str(tc.testCaseID), "input": tc.input, "output": tc.output} for tc in test_cases]
+            return Response (
+                {"testCases":data}
+                , status=status.HTTP_200_OK
+            )
+        return Response({"msg":"Invalid Challenge ID"} ,status=status.HTTP_400_BAD_REQUEST)
     
 class SolutionHandle(APIView):
     permission_classes = [IsAuthenticated]
@@ -49,25 +88,10 @@ class SolutionHandle(APIView):
         error=""
         iserror = True
         try:
-       # Create a Docker client
             code = request.data['code']
             language = request.data['lang']
             result = run_code(code=code,language=language)
             print()
-            # container = container_pool.get_container()
-            # file_path = "script.py"
-            # container.put_archive("/sandbox", create_tarball(code=code, file_name=  "Solution.js"))
-            # container.put_archive("/sandbox",create_tarball(code="21\n18\n",file_name="input.txt"))
-            # exec_result = container.exec_run("/bin/sh -c 'python3 /sandbox/Solution.py < /sandbox/input.txt 2> /sandbox/error.log'") 
-            # exec_result = container.exec_run("/bin/sh -c 'node /sandbox/Solution.js < /sandbox/input.txt 2> /sandbox/error.log'") 
-            # exec_result = container.exec_run("/bin/sh -c 'javac Solution.java && java Solution < /sandbox/input.txt'") 
-            # java": "javac Solution.java && java Solution"           
-            # output = exec_result.output.decode("utf-8")
-            # if exec_result.exit_code!=0:
-            #     error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
-            #     iserror = True
-            # container_pool.return_container(container=container)
-            # output = exec_result.output.decode("utf-8")  # Standard output from the command
         except Exception as e:
             print("got error")
             print(e)
