@@ -3,11 +3,13 @@ from threading import Lock, Thread
 import docker
 
 # Initialize Docker client
-client = docker.from_env()
+# client = ""
 
 # Create a thread-safe container pool
 class ContainerPool:
     def __init__(self, image, pool_size=2):
+        self.client = docker.from_env()
+        
         self.image = image
         self.pool = Queue(maxsize=pool_size)
         self.lock = Lock()
@@ -17,7 +19,7 @@ class ContainerPool:
             self.pool.put(self._create_container())
 
     def _create_container(self):
-        container = client.containers.run(
+        container = self.client.containers.run(
             self.image,  # Use an image with Python
             command=["tail", "-f", "/dev/null"],
             working_dir="/sandbox",# Command to run
