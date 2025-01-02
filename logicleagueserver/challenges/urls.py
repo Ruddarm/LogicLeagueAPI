@@ -12,6 +12,8 @@ urlpatterns = [
     path("challenge/<slug:challengeID>/testCase/",get_test_case_view),
     # get tescases view [testcaseid,marks,smaple] for a given challegne id
     path("challenge/admin/<slug:challengeID>/testCase/",testCaseView.as_view()),
+    #to pefrom delete and update of a testcase
+    path("challenge/admin/<slug:challengeID>/testCase/<slug:testCaseID>/",testCaseView.as_view()),
     # get testcases data for admin o a given challenge particular test case
     path("challenge/admin/<slug:challengeID>/<int:edit>/testCase/<slug:testCaseID>/",testCaseView.as_view()),
     

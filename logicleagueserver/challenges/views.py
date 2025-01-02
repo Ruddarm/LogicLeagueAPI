@@ -116,14 +116,15 @@ class testCaseView(APIView):
                     return Response({"error":test_case_serialized.error_messages},status=status.HTTP_400_BAD_REQUEST)
                             
     # to delte testcase 
-    def delete(self,request,challengeID,testCaseId=None):
-        if testCaseId:
+    def delete(self,request,challengeID,testCaseID=None):
+        if testCaseID:
             try:
-                deletable_test_case = TestCase.objects.get(testCaseID= testCaseId)
-                deletable_test_case.delete()()
+                test_case = TestCase.objects.get(challengeID__challengeID=challengeID, testCaseID=testCaseID)
+                test_case.delete();
                 return Response({"msg":"Deleted Sucessfully"}, status=status.HTTP_200_OK)
             except Exception as ex :
                 return Response({"error":f'{str(ex)}'}, status= status.HTTP_400_BAD_REQUEST)
+        return Response({"msg":f'tescase is required{testCaseID}'},status=status.HTTP_400_BAD_REQUEST)
                 
             
                 
