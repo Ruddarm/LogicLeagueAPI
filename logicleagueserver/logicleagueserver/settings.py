@@ -47,13 +47,15 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'allauth',
+    'django_extensions',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
     'challenges',
-    'docker'
+    'docker',
+    'contests',
 
 ]
 

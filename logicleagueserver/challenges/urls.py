@@ -3,7 +3,7 @@ from .views import ChallengeCreateView , SolutionHandle,Challenge,testCaseView,g
 
 urlpatterns = [
     # get admin challenge route
-    path("challenge/admin",ChallengeCreateView.as_view(),name="challenge"),
+    path("challenge/admin/",ChallengeCreateView.as_view(),name="challenge"),
     #display challenge rot
     path("challenge/",Challenge.as_view() ),
     # get challenge by id route
