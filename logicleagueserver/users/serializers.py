@@ -45,3 +45,36 @@ class LoginSerializer(serializers.ModelSerializer):
         if not auth_header or not auth_header.startswith("Bearer "): 
             raise AuthenticationFailed("Invalid Authenication")
         
+
+class UpdatePassSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Your old password is incorrect.")
+        return value
+
+    def validate_new_password(self, value):
+        return value
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        old_password = self.validated_data['old_password']
+        new_password = self.validated_data['new_password']
+        user.update_pass(old_password, new_password)
+
+class UpdateUsernameSerializer(serializers.Serializer):
+    new_username = serializers.CharField(write_only=True, max_length=50)
+
+    def validate_new_username(self, value):
+        if LogicLeagueUser.objects.filter(username=value).exists():
+            raise serializers.ValidationError("The username is already taken.")
+        return value
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        new_username = self.validated_data['new_username']
+        user.update_username(new_username)
+        

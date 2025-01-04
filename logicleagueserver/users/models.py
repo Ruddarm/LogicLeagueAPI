@@ -29,10 +29,12 @@ class UserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
+    
+    
 
 
 class LogicLeagueUser(AbstractBaseUser):
-    username = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     # is_admin = models.BooleanField(default=False)
     
@@ -55,6 +57,17 @@ class LogicLeagueUser(AbstractBaseUser):
     def has_module_perms(self, app_label):
         # Override to allow for module permission checks
         return self.is_admin
-
+    
+    def update_pass(self, old_password, new_password):
+        if not self.check_password(old_password):
+            raise ValidationError("The old password is incorrect.")
+        self.set_password(new_password)
+        self.save()
+        
+    def update_username(self, new_username):
+        if LogicLeagueUser.objects.filter(username=new_username).exists():
+            raise ValidationError("The username is already taken.")
+        self.username = new_username
+        self.save()
 
 #user Education models 

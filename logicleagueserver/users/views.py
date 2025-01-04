@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import LogicLeagueUser
-from .serializers import RegisterSerializer,UserSerializer,LoginSerializer
+from .serializers import RegisterSerializer,UserSerializer,LoginSerializer,UpdatePassSerializer,UpdateUsernameSerializer
 from dj_rest_auth.registration.views import SocialLoginView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from google.oauth2 import id_token
@@ -134,3 +134,24 @@ class LogoutView(APIView):
         response.delete_cookie("access_token")
         response.delete_cookie("refresh_token")
         return response
+    
+
+class UpdatePassView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = UpdatePassSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateUsernameView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = UpdateUsernameSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Username updated successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
