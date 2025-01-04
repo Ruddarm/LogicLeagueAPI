@@ -130,12 +130,11 @@ class testCaseView(APIView):
                 
 #To fetch test cases for play ground 
 @api_view(['GET'])
-def get_test_case_view(request, challengeID):
-    
+def get_test_case_view_terminal(request, challengeID):
+    print("here bsdk")
     if challengeID:
         # Fetch test cases for the given challenge ID
-        test_cases = TestCase.objects.filter(challengeID__challengeID=challengeID)
-
+        test_cases = TestCase.objects.filter(challengeID__challengeID=challengeID,isSample=True)
         if not test_cases.exists():
             return Response(
                 {"msg": "No test cases found for the given Challenge ID."},
@@ -152,6 +151,28 @@ def get_test_case_view(request, challengeID):
         ]
         return Response({"testCases": data}, status=status.HTTP_200_OK)
     # Invalid challengeID
+    return Response({"msg": "Invalid Challenge ID"}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_test_case_view_desc(request,challengeID):
+    if challengeID:
+        test_cases = TestCase.objects.filter(challengeID__challengeID=challengeID,isSample=True)
+        if not test_cases.exists():
+            return Response(
+                {"msg": "No test cases found for the given Challenge ID."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        data = [
+            {
+                "testCaseID": str(tc.testCaseID),
+                "input": tc.input,
+                "output": tc.output,
+                "isSampel":tc.isSample,
+                "explainaiton":tc.explaination
+            }
+            for tc in test_cases
+        ]
+        return Response({"testCases": data}, status=status.HTTP_200_OK)
     return Response({"msg": "Invalid Challenge ID"}, status=status.HTTP_400_BAD_REQUEST)
     
 class SolutionHandle(APIView):

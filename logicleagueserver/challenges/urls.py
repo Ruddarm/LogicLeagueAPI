@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import ChallengeCreateView , SolutionHandle,Challenge,testCaseView,get_test_case_view
+from .views import ChallengeCreateView , SolutionHandle,Challenge,testCaseView,get_test_case_view_terminal,get_test_case_view_desc
 
 urlpatterns = [
     # get admin challenge route
@@ -8,8 +8,10 @@ urlpatterns = [
     path("challenge/",Challenge.as_view() ),
     # get challenge by id route
     path("challenge/<slug:challengeID>/", Challenge.as_view(),name="getchallenge" ),
-    # get all testcases for a given challenge id
-    path("challenge/<slug:challengeID>/testCase/",get_test_case_view),
+    # get all testcases for a given challenge id for terminal view withtou explaination
+    path("challenge/<slug:challengeID>/testCase/",get_test_case_view_terminal),
+    # get all testcases for a given challenge id for description with explantion
+    path("challenge/<slug:challengeID>/testCase/desc",get_test_case_view_desc),
     # get tescases view [testcaseid,marks,smaple] for a given challegne id
     path("challenge/admin/<slug:challengeID>/testCase/",testCaseView.as_view()),
     #to pefrom delete and update of a testcase
