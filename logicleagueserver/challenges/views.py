@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from .serializers import CreateChalllengeSerializer,TestCaseSerializer
 from .Containerpool import  container_pool
 from  .CodeExecution import run_code
-import Challenge  as challenge_helper
+# import Challenge  as challenge_helper
 
 
 
