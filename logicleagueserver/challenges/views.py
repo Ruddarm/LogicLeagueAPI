@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from users.models import LogicLeagueUser
@@ -10,39 +10,49 @@ from rest_framework.views import APIView
 from .serializers import CreateChalllengeSerializer,TestCaseSerializer
 from .Containerpool import  container_pool
 from  .CodeExecution import run_code
+import Challenge  as challenge_helper
 
 
-# Admin views
-class ChallengeCreateView(APIView):
+
+# Admin views for challenge creation
+class challenge_admin_view(APIView):
     permission_classes = [IsAuthenticated]
+    # to create challenges
     def post(self,request,*args,**kwargs):
         user = request.user
-        print(user.id)
-        print(request.data["ChallengeState"])
         logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
-        # request.data["createdBy"]=logicLeagueUser.id; 
         serializer = CreateChalllengeSerializer(data=request.data["ChallengeState"])
         if serializer.is_valid():
             new_challenge =  serializer.create(serializer.data,logicLeagueUser)
             return Response({"Msg":"Challenge Created Sucessfully","id":new_challenge.challengeID},status=status.HTTP_200_OK)
         else:
             return Response({ "msg":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    # to get challenge data for admin if required
     def get(self,request,*args,**kwargs):
         pass
-        # try :
-        #     challenge_model_data = Challenges.objects.values("challengeID","challengeName",'challengeLevel');
-        #     challenge_data = [{"challengeID":str(c['challengeID']),"challengeName":c['challengeName'],"challengeLevel":c['challengeLevel']} for c in challenge_model_data]
-        # except Exception as ex :
-        #     return Response ({"error":str(ex)} , status=status.HTTP_400_BAD_REQUEST)
-        # return Response({"challenges":challenge_data},status=status.HTTP_200_OK)
+    # updata challegne data 
+    def put(self,request,challengeID,*args,**kwargs):
+        challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)        
+        if challenge_instance:
+            # print(request.data["ChallengeState"])
+            challengeSerializer = CreateChalllengeSerializer(challenge_instance ,data=request.data["ChallengeState"])
+            if(challengeSerializer.is_valid()):
+                challengeSerializer.save()
+                return Response({"msg":"Updated Sucessfully"},status=status.HTTP_200_OK )
+        return Response({"msg":"challengeSerializer"},status=status.HTTP_400_BAD_REQUEST)
+    # Delete challenge data 
+    def delete(self,request,challengeID,*args,**kwargs):
+        challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)
+        if challenge_instance:
+            challenge_instance.delete()
+            return Response({"msg":"Deleted Sucessfully"},status=status.HTTP_200_OK)
+        return Response({"msg":"Invalid Challenge ID"},status=status.HTTP_400_BAD_REQUEST)
     
-# non admin views
-class Challenge(APIView):
+# Get Challenge data for users playground dispalay
+class challenge_user_view(APIView):
     permission_classes =[AllowAny]
-    def post():
-        pass
     def get(self,request,challengeID=None,*args,**kwargs):
-        # a6401008-75a9-4beb-a3c6-d98b290f088d
+        # if challenge id return challenge data
         if challengeID:
             challenge = get_object_or_404(Challenges,challengeID=challengeID)
             return Response({"challenge":{"challengeName":challenge.challengeName,
@@ -53,6 +63,7 @@ class Challenge(APIView):
                                       "outputFormat":challenge.outputFormat,
                                       "constraints":challenge.constraints,
                                       }},status=status.HTTP_200_OK)    
+        # else return all challenges
         else:
             try :
                 challenge_model_data = Challenges.objects.values("challengeID","challengeName",'challengeLevel');
@@ -61,21 +72,10 @@ class Challenge(APIView):
                 return Response ({"error":str(ex)} , status=status.HTTP_400_BAD_REQUEST)
             return Response({"challenges":challenge_data},status=status.HTTP_200_OK)
             
-    def put(self,request,challengeID,*args,**kwargs):
-    
-        data =  request.data["ChallengeState"];
-        challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)        
-        if challenge_instance:
-            print(request.data["ChallengeState"])
-            challengeSerializer = CreateChalllengeSerializer(challenge_instance ,data=request.data["ChallengeState"])
-            if(challengeSerializer.is_valid()):
-                challengeSerializer.save()
-                return Response({"msg":"Updated Sucessfully"},status=status.HTTP_200_OK )
-        return Response({"msg":"challengeSerializer"},status=status.HTTP_400_BAD_REQUEST)
-
-# admin views
-class testCaseView(APIView):
+# Test case view for admin to create,update,delete test cases
+class testcase_admin_view(APIView):
     permission_classes = [IsAuthenticated]
+    # Create test case for a challenge
     def post(self,request,*args,**kwargs):
         serializer = TestCaseSerializer(data=request.data.get('testCase', {}))
         if serializer.is_valid():
@@ -91,6 +91,7 @@ class testCaseView(APIView):
     # Get test cases for challenge  to edit /view
     def get(self,request,challengeID,edit=0,testCaseID=None,*args,**kwargs):
         if challengeID:
+            # get test case for a given challenge id and test case id
             if  edit:
                 test_case = get_object_or_404(TestCase,testCaseID=testCaseID)
                 data = {"testCaseID": test_case.testCaseID, "input": test_case.input, "output": test_case.output,"marks":test_case.marks,"isSample":test_case.isSample,"explaination":test_case.explaination} 
@@ -98,6 +99,7 @@ class testCaseView(APIView):
                 {"testCase":data}
                 , status=status.HTTP_200_OK
                 )
+            # get all test cases for a given challenge id
             test_case_data = TestCase.objects.filter(challengeID__challengeID=challengeID)
             test_case = [{"testCaseId":tc.testCaseID,"marks":tc.marks,"isSample":tc.isSample} for tc in test_case_data]
             return Response({"testCases":test_case},
@@ -113,9 +115,8 @@ class testCaseView(APIView):
                     test_case_serialized.save()
                     return Response({"msg":"Updated Sucessfully"},status=status.HTTP_200_OK )
                 else:
-                    return Response({"error":test_case_serialized.error_messages},status=status.HTTP_400_BAD_REQUEST)
-                            
-    # to delte testcase 
+                    return Response({"error":test_case_serialized.error_messages},status=status.HTTP_400_BAD_REQUEST)                
+    # To delete test case
     def delete(self,request,challengeID,testCaseID=None):
         if testCaseID:
             try:
@@ -128,8 +129,9 @@ class testCaseView(APIView):
                 
             
                 
-#To fetch test cases for play ground 
+#To fetch test cases for terminal withou explaination
 @api_view(['GET'])
+@permission_classes([AllowAny]) 
 def get_test_case_view_terminal(request, challengeID):
     print("here bsdk")
     if challengeID:
@@ -152,8 +154,10 @@ def get_test_case_view_terminal(request, challengeID):
         return Response({"testCases": data}, status=status.HTTP_200_OK)
     # Invalid challengeID
     return Response({"msg": "Invalid Challenge ID"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+# To fetch test cases fo user playground with explaination
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_test_case_view_desc(request,challengeID):
     if challengeID:
         test_cases = TestCase.objects.filter(challengeID__challengeID=challengeID,isSample=True)
@@ -174,7 +178,8 @@ def get_test_case_view_desc(request,challengeID):
         ]
         return Response({"testCases": data}, status=status.HTTP_200_OK)
     return Response({"msg": "Invalid Challenge ID"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+# To handle code execution
 class SolutionHandle(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
