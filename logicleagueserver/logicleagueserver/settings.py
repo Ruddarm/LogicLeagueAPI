@@ -67,8 +67,8 @@ REST_FRAMEWORK={
 
 }
 JWT_AUTH_COOKIE = 'access_token'  # Cookie name for JWT token
-JWT_AUTH_COOKIE_SECURE = False  # Set to True in production with HTTPS
-JWT_AUTH_COOKIE_SAMESITE = 'None'  # Allow cross-origin cookie access
+JWT_AUTH_COOKIE_SECURE = True  # Set to True in production with HTTPS
+JWT_AUTH_COOKIE_SAMESITE = "None"  # Allow cross-origin cookie access
 JWT_AUTH_COOKIE_HTTPONLY = True  
 
 
