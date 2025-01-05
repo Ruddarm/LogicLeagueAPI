@@ -87,7 +87,7 @@ MIDDLEWARE = [
     
 ]
 CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_SECURE = True  # Set to True in production with HTTPS
 CSRF_COOKIE_HTTPONLY = True
 
 CORS_ALLOWED_ORIGINS = [
