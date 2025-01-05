@@ -109,16 +109,16 @@ class GoogleLogin(APIView):
                 key="access_token",
                 value=str(tokens["access"]),
                 httponly=True,
-                secure=False ,
-                samesite="Lax",
+                secure=True ,
+                samesite="None",
                 max_age=7*24*60*60*1000
             )
             response.set_cookie(
                 key="refresh_token",
                 value=str(tokens["refresh"]),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
-                samesite="Lax",
+                secure=True,  # Set to True in production with HTTPS
+                samesite="None",
                 max_age=7*24*60*60*1000
             )
             return response;
