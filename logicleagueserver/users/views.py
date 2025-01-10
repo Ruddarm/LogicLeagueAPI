@@ -104,7 +104,7 @@ class GoogleLogin(APIView):
                     "username":user.username,
                     "email":user.email,   
                 }},
-                                status=status.HTTP_200_OK)
+            status=status.HTTP_200_OK)
             response.set_cookie(
                 key="access_token",
                 value=str(tokens["access"]),

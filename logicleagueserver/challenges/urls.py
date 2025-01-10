@@ -21,6 +21,6 @@ urlpatterns = [
     # get all testcases for a given challenge id for description with explantion
     path("challenge/<slug:challengeID>/testCase/desc",get_test_case_view_desc),
     # get tescases view [testcaseid,marks,smaple] for a given challegne id
-    path("solution/",SolutionHandle.as_view())
+    path("challenge/runcode/<slug:challengeID>/",SolutionHandle.as_view())
     
 ]

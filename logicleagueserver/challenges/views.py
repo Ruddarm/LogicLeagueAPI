@@ -10,7 +10,6 @@ from rest_framework.views import APIView
 from .serializers import CreateChalllengeSerializer,TestCaseSerializer
 from .Containerpool import  container_pool
 from  .CodeExecution import run_code
-import Challenge  as challenge_helper
 
 
 
@@ -181,15 +180,15 @@ def get_test_case_view_desc(request,challengeID):
 
 # To handle code execution
 class SolutionHandle(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request, *args, **kwargs):
+    permission_classes = [AllowAny]
+    def post(self, request, challengeID, *args, **kwargs):
         output = ""
         error=""
         iserror = True
         try:
             code = request.data['code']
             language = request.data['lang']
-            result = run_code(code=code,language=language)
+            result = run_code(code=code,language=language, challenge_id=challengeID)
             print()
         except Exception as e:
             print("got error")
@@ -197,6 +196,6 @@ class SolutionHandle(APIView):
             error = f"Error: {str(e)}"
             return Response({"error":error},status=status.HTTP_400_BAD_REQUEST);
         
-        return Response({"output": result['output'],"error":result['error'] , "isError":result['iserror']}, status=200)
+        return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror']}, status=200)
         
         
