@@ -1,7 +1,7 @@
 import io
 import tarfile
 from .Containerpool import  container_pool
-from .models import TestCase
+from .models import TestCase , Solution
 class languageError(Exception):
     def __init__(self, msg,*args):
         super().__init__(msg)
@@ -28,7 +28,6 @@ def run_code(code,language, challenge_id):
     output=""
     error=""
     iserror=False
-    
     try:
         complie_cmd, extension , exe_cmd = get_cmd_lang(language);
         # filename
@@ -72,4 +71,48 @@ def run_code(code,language, challenge_id):
         container_pool.return_container(container=container)
     return {"result":result,"output":output,"error":error,"iserror":iserror}
         
-    
+def submit_code(code,language,challenge_id,user_id):
+    output=""
+    error=""
+    iserror=False
+    try:
+        complie_cmd, extension , exe_cmd = get_cmd_lang(language);
+        # filename
+        filename = f'Solution{extension}'
+        # get container
+        container = container_pool.get_container()
+        # put code in container
+        container.put_archive("/sandbox", create_tarball(code=code, file_name=  filename))
+        # put error log file in container
+        container.put_archive("/sandbox",create_tarball(code="",file_name="error.log"))
+        # if progming lang required compilation
+        if complie_cmd:
+            exec_result = container.exec_run(complie_cmd)
+            if exec_result.exit_code!=0:
+                error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
+                iserror = True
+                print(error)
+                return {"result":"","output":output,"error":error,"iserror":iserror}
+        testCase = TestCase.objects.filter(challengeID=challenge_id)
+        result  = []
+        # run code for each test case
+        for test in testCase:
+            print(f'input is {test.input_txt} \n output is {test.output_txt} \n')
+            container.put_archive("/sandbox",create_tarball(code=test.input_txt,file_name="input.txt")) 
+            exec_result = container.exec_run(exe_cmd)
+            output = exec_result.output.decode("utf-8")
+            # Comapre output with expected output
+            for i in zip(output.strip().split('\n'),test.output_txt.split('\n')):
+                if i[0].strip() != i[1].strip():
+                    result.append({"testCaseId":test.testCaseID,"input":test.input,"output":test.output,"ans":i[0],"result":False});
+                    return {"result":result,"output":output,"error":error,"iserror":iserror,"submited":False}	
+            if exec_result.exit_code!=0:
+                error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
+                iserror = True
+        solution = Solution.objects.create(code=code,language=language,challengeID=challenge_id,user_id=user_id)
+    except :
+        raise
+    finally:
+        container.exec_run(f"rm -f /sandbox/{filename} /sandbox/input.txt /sandbox/error.log")
+        container_pool.return_container(container=container)
+    return {"result":result,"output":output,"error":error,"iserror":iserror,"submited":True}

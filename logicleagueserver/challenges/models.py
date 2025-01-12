@@ -40,13 +40,16 @@ class TestCase(models.Model):
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)    
 
 class Solution(models.Model):
+    # solution id 
     solutionID= models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    # code language
     language = models.CharField(max_length=100,null=False)
+    # code
     code = models.TextField(null=True,default="");
-    submission_date_time = models.DateTimeField
+    submission_date_time = models.DateTimeField(auto_now_add=True)
     runtime = models.CharField(null=True)
-    space = models.CharField(null=True)
+    # space = models.CharField(null=True)
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)
-    submitedBy = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE)
+    userId = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
     

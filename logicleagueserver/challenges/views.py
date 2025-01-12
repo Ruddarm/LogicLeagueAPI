@@ -189,13 +189,31 @@ class SolutionHandle(APIView):
             code = request.data['code']
             language = request.data['lang']
             result = run_code(code=code,language=language, challenge_id=challengeID)
-            print()
         except Exception as e:
-            print("got error")
-            print(e)
             error = f"Error: {str(e)}"
             return Response({"error":error},status=status.HTTP_400_BAD_REQUEST);
         
         return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror']}, status=200)
         
         
+# Submit submission for a challenge
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_submission(request,challengeID):
+    if challengeID:
+        user = request.user
+        logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
+        challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)
+        if challenge_instance and logicLeagueUser:
+            try:
+                code = request.data['code']
+                language = request.data['lang']
+                result = run_code(code=code,language=language, challenge_id=challengeID,run=False)
+                if not result['iserror']:
+                    return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror']}, status=200)
+                else:
+                    return Response({"error":result['error']},status=status.HTTP_400_BAD_REQUEST)
+            except Exception as ex:
+                return Response({"error":str(ex)},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg":"Invalid Challenge ID"},status=status.HTTP_400_BAD_REQUEST)
+    return Response({"msg":"Challenge ID is required"},status=status.HTTP_400_BAD_REQUEST)
