@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import CreateChalllengeSerializer,TestCaseSerializer
 from .Containerpool import  container_pool
-from  .CodeExecution import run_code
+from  .CodeExecution import run_code , submit_code
 
 
 
@@ -204,16 +204,22 @@ def submit_submission(request,challengeID):
         user = request.user
         logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
         challenge_instance = get_object_or_404(Challenges,challengeID=challengeID)
+        # if we get chalelnge instance and user instance
         if challenge_instance and logicLeagueUser:
             try:
                 code = request.data['code']
                 language = request.data['lang']
-                result = run_code(code=code,language=language, challenge_id=challengeID,run=False)
+                result = submit_code(code=code,language=language, challenge_instance=challenge_instance,user_instance=logicLeagueUser)
+                # handeling error 
+                print(result)
                 if not result['iserror']:
-                    return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror']}, status=200)
+                    # if error not occured
+                    # if submission is sucessfull
+                    return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror'] , "submited": result["submited"]}, status=200)
                 else:
                     return Response({"error":result['error']},status=status.HTTP_400_BAD_REQUEST)
             except Exception as ex:
+                # if error raised
                 return Response({"error":str(ex)},status=status.HTTP_400_BAD_REQUEST)
-        return Response({"msg":"Invalid Challenge ID"},status=status.HTTP_400_BAD_REQUEST)
+    # if challenge id is not provided
     return Response({"msg":"Challenge ID is required"},status=status.HTTP_400_BAD_REQUEST)

@@ -71,7 +71,7 @@ def run_code(code,language, challenge_id):
         container_pool.return_container(container=container)
     return {"result":result,"output":output,"error":error,"iserror":iserror}
         
-def submit_code(code,language,challenge_id,user_id):
+def submit_code(code,language,challenge_instance,user_instance  ):
     output=""
     error=""
     iserror=False
@@ -92,12 +92,13 @@ def submit_code(code,language,challenge_id,user_id):
                 error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
                 iserror = True
                 print(error)
+                # case 1 if compilation error
                 return {"result":"","output":output,"error":error,"iserror":iserror}
-        testCase = TestCase.objects.filter(challengeID=challenge_id)
+        testCase = TestCase.objects.filter(challengeID=challenge_instance.challengeID)
         result  = []
         # run code for each test case
         for test in testCase:
-            print(f'input is {test.input_txt} \n output is {test.output_txt} \n')
+            # print(f'input is {test.input_txt} \n output is {test.output_txt} \n')
             container.put_archive("/sandbox",create_tarball(code=test.input_txt,file_name="input.txt")) 
             exec_result = container.exec_run(exe_cmd)
             output = exec_result.output.decode("utf-8")
@@ -105,11 +106,13 @@ def submit_code(code,language,challenge_id,user_id):
             for i in zip(output.strip().split('\n'),test.output_txt.split('\n')):
                 if i[0].strip() != i[1].strip():
                     result.append({"testCaseId":test.testCaseID,"input":test.input,"output":test.output,"ans":i[0],"result":False});
+                    # if submisision get false for any test case
                     return {"result":result,"output":output,"error":error,"iserror":iserror,"submited":False}	
             if exec_result.exit_code!=0:
                 error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
                 iserror = True
-        solution = Solution.objects.create(code=code,language=language,challengeID=challenge_id,user_id=user_id)
+        solution = Solution.objects.create(code=code,language=language,challengeID=challenge_instance,userId=user_instance)
+        print(solution.solutionID," submited")
     except :
         raise
     finally:

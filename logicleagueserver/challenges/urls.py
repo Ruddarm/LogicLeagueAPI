@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import challenge_admin_view , SolutionHandle,challenge_user_view,testcase_admin_view,get_test_case_view_terminal,get_test_case_view_desc
+from .views import challenge_admin_view , SolutionHandle,challenge_user_view,testcase_admin_view,get_test_case_view_terminal,get_test_case_view_desc , submit_submission
 
 urlpatterns = [
     # create challenge by admin
@@ -21,6 +21,7 @@ urlpatterns = [
     # get all testcases for a given challenge id for description with explantion
     path("challenge/<slug:challengeID>/testCase/desc",get_test_case_view_desc),
     # get tescases view [testcaseid,marks,smaple] for a given challegne id
-    path("challenge/runcode/<slug:challengeID>/",SolutionHandle.as_view())
+    path("challenge/runcode/<slug:challengeID>/",SolutionHandle.as_view()),
+    path("challenge/<slug:challengeID>/submit/",submit_submission),
     
 ]
