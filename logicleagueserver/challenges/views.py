@@ -200,6 +200,27 @@ class SolutionHandle(APIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def submit_submission(request,challengeID):
+    """
+    Handles the submission of a challenge solution.
+    This view allows authenticated users to submit their code for a specific challenge. 
+    It verifies the challenge ID, processes the code and language provided by the user, 
+    and evaluates the solution against test cases.
+
+    Parameters:
+    - request (HttpRequest): The HTTP request object containing user and submission data.
+    - challengeID (int): The ID of the challenge being submitted.
+
+    Returns:
+    - Response: A JSON response containing:
+        - `result` (str): The status of the submission.
+        - `output` (str): The output of the code execution.
+        - `error` (str): Any error encountered during execution.
+        - `isError` (bool): Indicates if there was an error.
+        - `submitted` (bool): Indicates if the submission was successful.
+    - HTTP 400: If there is a bad request or missing/invalid challenge ID.
+    - HTTP 200: If the submission is processed successfully.
+    """
+
     if challengeID:
         user = request.user
         logicLeagueUser = get_object_or_404(LogicLeagueUser, id = user.id)
@@ -209,15 +230,11 @@ def submit_submission(request,challengeID):
             try:
                 code = request.data['code']
                 language = request.data['lang']
+                # submit_code will run code for each test case and submit data if its sucesfully return 
+                
                 result = submit_code(code=code,language=language, challenge_instance=challenge_instance,user_instance=logicLeagueUser)
-                # handeling error 
-                print(result)
-                if not result['iserror']:
-                    # if error not occured
-                    # if submission is sucessfull
-                    return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror'] , "submited": result["submited"]}, status=200)
-                else:
-                    return Response({"error":result['error']},status=status.HTTP_400_BAD_REQUEST)
+                print("res is ",result)
+                return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror'] , "submited": result["submited"]}, status=200)
             except Exception as ex:
                 # if error raised
                 return Response({"error":str(ex)},status=status.HTTP_400_BAD_REQUEST)

@@ -63,7 +63,9 @@ def run_code(code,language, challenge_id):
             # print(f'input is {test.input_txt} \n output is {output} \n')
             if exec_result.exit_code!=0:
                 error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
+         
                 iserror = True
+                break
     except :
         raise
     finally:
@@ -102,15 +104,19 @@ def submit_code(code,language,challenge_instance,user_instance  ):
             container.put_archive("/sandbox",create_tarball(code=test.input_txt,file_name="input.txt")) 
             exec_result = container.exec_run(exe_cmd)
             output = exec_result.output.decode("utf-8")
+            if exec_result.exit_code!=0:
+                print("here error ",error)
+                iserror=True
+                error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
+                iserror = True
+                break
             # Comapre output with expected output
             for i in zip(output.strip().split('\n'),test.output_txt.split('\n')):
                 if i[0].strip() != i[1].strip():
                     result.append({"testCaseId":test.testCaseID,"input":test.input,"output":test.output,"ans":i[0],"result":False});
                     # if submisision get false for any test case
                     return {"result":result,"output":output,"error":error,"iserror":iserror,"submited":False}	
-            if exec_result.exit_code!=0:
-                error = container.exec_run("cat /sandbox/error.log").output.decode('utf-8');
-                iserror = True
+            
         solution = Solution.objects.create(code=code,language=language,challengeID=challenge_instance,userId=user_instance)
         print(solution.solutionID," submited")
     except :
