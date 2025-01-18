@@ -1,7 +1,6 @@
 from django.db import models
 from users.models import LogicLeagueUser
 import uuid
-
 # Create your models here.
 
 #Testcase 
@@ -47,7 +46,7 @@ class Solution(models.Model):
     # code
     code = models.TextField(null=True,default="");
     submission_date_time = models.DateTimeField(auto_now_add=True)
-    runtime = models.CharField(null=True)
+    runtime = models.FloatField(null=True,default=0)
     # space = models.CharField(null=True)
     challengeID = models.ForeignKey(Challenges,on_delete=models.CASCADE)
     userId = models.ForeignKey(LogicLeagueUser,on_delete=models.CASCADE)

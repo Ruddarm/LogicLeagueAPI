@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from users.models import LogicLeagueUser
-from .models import Challenges,TestCase
+from .models import Challenges,TestCase , Solution
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
@@ -158,6 +158,14 @@ def get_test_case_view_terminal(request, challengeID):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_test_case_view_desc(request,challengeID):
+    """
+     Return test case view which are public and may include explantion with them 
+     Parameters: 
+        -request (Httprequest) A http request object 
+        -challengID (uuid) A challenge id of existing challenge which test cases is requied 
+     return : 
+        -it will return the array of test cases if challenge exist for given challenge ID else it will raise erro 404  
+    """
     if challengeID:
         test_cases = TestCase.objects.filter(challengeID__challengeID=challengeID,isSample=True)
         if not test_cases.exists():
@@ -179,9 +187,34 @@ def get_test_case_view_desc(request,challengeID):
     return Response({"msg": "Invalid Challenge ID"}, status=status.HTTP_400_BAD_REQUEST)
 
 # To handle code execution
-class SolutionHandle(APIView):
+class run_sollution(APIView):
     permission_classes = [AllowAny]
     def post(self, request, challengeID, *args, **kwargs):
+        """ 
+            # Extract code and language from the request
+            code = request.data.get('code')
+            language = request.data.get('lang')
+
+            # Validate the presence of code and language
+            if not code or not language:
+                return Response({"error": "Code and language are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Execute the code
+            result = run_code(code=code, language=language, challenge_id=challengeID)
+
+            # Prepare the response data
+            output = result.get('output', '')
+            error = result.get('error', '')
+            is_error = result.get('iserror', True)
+
+            # Return the response
+            return Response({
+                "result": result.get('result', ''),
+                "output": output,
+                "error": error,
+                "isError": is_error
+            }, status=status.HTTP_200_OK)
+        """
         output = ""
         error=""
         iserror = True
@@ -233,10 +266,30 @@ def submit_submission(request,challengeID):
                 # submit_code will run code for each test case and submit data if its sucesfully return 
                 
                 result = submit_code(code=code,language=language, challenge_instance=challenge_instance,user_instance=logicLeagueUser)
-                print("res is ",result)
                 return Response({"result":result['result'],"output": result['output'],"error":result['error'] , "isError":result['iserror'] , "submited": result["submited"]}, status=200)
             except Exception as ex:
                 # if error raised
                 return Response({"error":str(ex)},status=status.HTTP_400_BAD_REQUEST)
     # if challenge id is not provided
     return Response({"msg":"Challenge ID is required"},status=status.HTTP_400_BAD_REQUEST)
+
+
+# A view to get challlenge details 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_submission(request,challengeID):
+    """Get a existing solution of a user for a given challenge id if he had solved the challenge 
+    Args:
+        request (httprquest): a httprequest object 
+        challengeID (uui): challenge id
+    return : 
+        Solutions  : it will return a a solution object which will include solution id , runtime, code, languege , data and time 
+        
+    """
+    if challengeID:
+        user = request.user;
+        solution_instance = Solution.objects.filter(challengeID=challengeID,userId=user.id)
+        return Response({"Solution":[{"code":sol.code,"lang":sol.language,"date":sol.submission_date_time,"runtime":sol.runtime} for sol in solution_instance]}, status=status.HTTP_200_OK)
+        
+   
+    return Response(status=status.HTTP_200_OK)
