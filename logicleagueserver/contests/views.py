@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework.permissions import AllowAny
 
+from django.utils import timezone
+
 # Create your views here.
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,20 +11,26 @@ from .models import Contest
 from .serializers import ContestSerializer
 from django.shortcuts import get_object_or_404, render
 
-# List all contests or create a new contest
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def contest_list(request):
     if request.method == 'GET':
-        contests = Contest.objects.all()
-        serializer = ContestSerializer(contests, many=True)
-        return Response(serializer.data)
+        current_time = timezone.now()
 
-    elif request.method == 'POST':
-        serializer = ContestSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Get active contests (current time is between start_time and end_time)
+        active_contests = Contest.objects.filter(start_time__lte=current_time, end_time__gte=current_time)
+        
+        # Get upcoming contests (contests that haven't started yet)
+        upcoming_contests = Contest.objects.filter(start_time__gt=current_time)
+
+        # Serialize the contests
+        active_serializer = ContestSerializer(active_contests, many=True)
+        upcoming_serializer = ContestSerializer(upcoming_contests, many=True)
+
+        return Response({
+            "active_contests": active_serializer.data,
+            "upcoming_contests": upcoming_serializer.data,
+        })
 
 def contest_detail(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
@@ -52,8 +60,8 @@ def contest_list(request):
 
 
 
-# Handle contest registration
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Or use a more restrictive permission class
 def contest_registration(request, contest_id):
     try:
         contest = Contest.objects.get(id=contest_id)
@@ -90,6 +98,7 @@ def contest_admin_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)'''
         
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
 def contest_admin_list(request):
     if request.method == 'GET':
         contests = Contest.objects.all()
@@ -102,9 +111,25 @@ def contest_admin_list(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def contest_admin_manage(request):
+    if request.method == 'GET':
+        contests = Contest.objects.filter(active=True) | Contest.objects.filter(start_time__gte=now())
+        serializer = ContestSerializer(contests, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = ContestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])
 def contest_admin_detail(request, contest_id):
     # Uncomment the staff check if needed
     # if not request.user.is_staff:

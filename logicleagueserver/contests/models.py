@@ -24,7 +24,6 @@ class Contest(models.Model):
     prizes = models.CharField(max_length=300, blank=True, null=True) 
 
     # Status
-    is_active = models.BooleanField(default=True) 
     is_public = models.BooleanField(default=False) 
 
     #challenge = models.ForeignKey(Challenges, on_delete=models.CASCADE, related_name='contests')
@@ -34,6 +33,11 @@ class Contest(models.Model):
 
     def __str__(self):
         return self.name
+    
+    '''@property
+    def is_active(self):
+        now = timezone.now()
+        return self.start_time <= now <= self.end_time'''
 
 
 

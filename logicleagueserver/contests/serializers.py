@@ -12,8 +12,6 @@ class SubmissionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ContestSerializer(serializers.ModelSerializer):
-    problems = ProblemSerializer(many=True, read_only=True)
-
     class Meta:
         model = Contest
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'start_time', 'end_time','prizes']
