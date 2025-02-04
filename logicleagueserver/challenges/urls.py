@@ -1,22 +1,31 @@
 from django.urls import path,include
-from .views import ChallengeCreateView , SolutionHandle,Challenge,testCaseView,get_test_case_view
+from .views import challenge_admin_view , run_sollution,challenge_user_view,testcase_admin_view,get_test_case_view_terminal,get_test_case_view_desc , submit_submission , get_submission
 
 urlpatterns = [
-    # get admin challenge route
-    path("challenge/admin/",ChallengeCreateView.as_view(),name="challenge"),
-    #display challenge rot
-    path("challenge/",Challenge.as_view() ),
-    # get challenge by id route
-    path("challenge/<slug:challengeID>/", Challenge.as_view(),name="getchallenge" ),
-    # get all testcases for a given challenge id
-    path("challenge/<slug:challengeID>/testCase/",get_test_case_view),
-    # get tescases view [testcaseid,marks,smaple] for a given challegne id
-    path("challenge/admin/<slug:challengeID>/testCase/",testCaseView.as_view()),
+    # create challenge by admin
+    path("challenge/admin",challenge_admin_view.as_view(),name="challenge"),
+    # update/delete challenge by admin
+    path("challenge/admin/<slug:challengeID>/",challenge_admin_view.as_view(),name="challenge"),
+    # get challenge by challenge data for admin
+    path("challenge/admin/<slug:challengeID>/testCase/",testcase_admin_view.as_view()),
     #to pefrom delete and update of a testcase
-    path("challenge/admin/<slug:challengeID>/testCase/<slug:testCaseID>/",testCaseView.as_view()),
+    path("challenge/admin/<slug:challengeID>/testCase/<slug:testCaseID>/",testcase_admin_view.as_view()),
     # get testcases data for admin o a given challenge particular test case
-    path("challenge/admin/<slug:challengeID>/<int:edit>/testCase/<slug:testCaseID>/",testCaseView.as_view()),
+    path("challenge/admin/<slug:challengeID>/<int:edit>/testCase/<slug:testCaseID>/",testcase_admin_view.as_view()),
+    #display challenge for  user
+    path("challenge/",challenge_user_view.as_view() ),
+    # get challenge by challenge id for user
+    path("challenge/<slug:challengeID>/", challenge_user_view.as_view(),name="getchallenge" ),
+    # get all testcases for a given challenge id for terminal view withtou explaination
+    path("challenge/<slug:challengeID>/testCase/",get_test_case_view_terminal),
+    # get all testcases for a given challenge id for description with explantion
+    path("challenge/<slug:challengeID>/testCase/desc",get_test_case_view_desc),
+    # get tescases view [testcaseid,marks,smaple] for a given challegne id
+    path("challenge/runcode/<slug:challengeID>/",run_sollution.as_view()),
+    # submit solution 
+    path("challenge/<slug:challengeID>/submit/",submit_submission),
+    # get submitied solutions 
+    path("challenge/solution/<slug:challengeID>/", get_submission)
     
-    path("solution/",SolutionHandle.as_view())
     
 ]

@@ -56,4 +56,20 @@ class TestCaseSerializer(serializers.ModelSerializer):
         validated_data['input_txt'] = text_content;
         validated_data['output_txt'] = validated_data['output']+"\n"
         return TestCase.objects.create(**validated_data)
-         
+        
+class SolutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Solution
+        fields = ['solutionID', 'code', 'challengeID', 'userID', 'language']
+        extra_kwargs = {
+            "solutionID": {"read_only": True},
+            "userID": {"read_only": True}
+        }
+        
+    def create(self, validated_data):
+        return Solution.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.solution = validated_data.get('solution', instance.solution)
+        instance.save()
+        return instance
