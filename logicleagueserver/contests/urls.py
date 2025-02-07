@@ -14,9 +14,12 @@ urlpatterns = [
     # Admin view: specific contest details, update, or delete
     path('admin/contests/<int:contest_id>/', views.contest_admin_detail, name='contest-admin-detail'),
 
+    # Add a problem to a contest
+    path('admin/contests/<int:contest_id>/add_problem/', views.add_challenges_to_contest, name='add-problem-to-contest'),
+
     # Contest detail view for non-admin users (can view details)
     path('contests/<int:contest_id>/', views.contest_detail, name='contest-detail'),
     
-    
-    path('admin/manage/', views.contest_admin_list, name='contest-admin-manage'),
+    # Admin manage view (if needed)
+    path('admin/manage/', views.contest_admin_manage, name='contest-admin-manage'),
 ]

@@ -14,4 +14,4 @@ class SubmissionSerializer(serializers.ModelSerializer):
 class ContestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contest
-        fields = ['id', 'name', 'description', 'start_time', 'end_time','prizes']
+        fields = ['id', 'name', 'description', 'start_time', 'end_time', 'prizes', 'participants', 'is_public','challenges']
