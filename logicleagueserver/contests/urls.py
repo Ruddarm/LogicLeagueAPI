@@ -12,14 +12,18 @@ urlpatterns = [
     path('admin/contests/', views.contest_admin_list, name='contest-admin-list'),
     
     # Admin view: specific contest details, update, or delete
-    path('admin/contests/<int:contest_id>/', views.contest_admin_detail, name='contest-admin-detail'),
+    path('admin/contests/<int:contest_id>/', views.contest_admin_detail, name='contest-admin-detail'),  # DELETE is handled here
 
     # Add a problem to a contest
-    path('admin/contests/<int:contest_id>/add_problem/', views.add_challenges_to_contest, name='add-problem-to-contest'),
+    path('admin/contests/<int:contest_id>/addchallenge/', views.add_challenges_to_contest, name='add-problem-to-contest'),
 
     # Contest detail view for non-admin users (can view details)
     path('contests/<int:contest_id>/', views.contest_detail, name='contest-detail'),
     
     # Admin manage view (if needed)
     path('admin/manage/', views.contest_admin_manage, name='contest-admin-manage'),
+
+    # Admin-specific endpoint to delete a contest explicitly (optional but adds clarity)
+    path('admin/contests/<int:contest_id>/delete/', views.delete_contest, name='delete-contest'),
+  # Same as contest_admin_detail (DELETE)
 ]
