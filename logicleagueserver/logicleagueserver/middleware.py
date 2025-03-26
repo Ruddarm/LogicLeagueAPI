@@ -7,8 +7,7 @@ class PrintRequestHeadersMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.authenticator = JWTAuthentication()
-
-
+        
     def __call__(self, request):
         token = request.COOKIES.get('access_token')
         if token:

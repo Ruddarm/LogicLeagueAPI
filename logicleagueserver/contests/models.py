@@ -21,7 +21,7 @@ class Contest(models.Model):
     description = models.TextField(null=False, blank=False)
     start_time = models.DateTimeField(null=False, blank=False, default=timezone.now)
     end_time = models.DateTimeField(null=False, blank=False, default=timezone.now) 
-    prizes = models.CharField(max_length=300, blank=True, null=True) 
+    prizes = models.TextField(max_length=300, blank=True, null=True) 
 
     # Status
     is_public = models.BooleanField(default=False) 

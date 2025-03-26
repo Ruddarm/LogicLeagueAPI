@@ -18,11 +18,11 @@ def contest_list(request):
         current_time = timezone.now()
 
         # Get active contests (current time is between start_time and end_time)
-        active_contests = Contest.objects.filter(start_time__lte=current_time, end_time__gte=current_time)
+        active_contests = Contest.objects.filter()
         
         # Get upcoming contests (contests that haven't started yet)
-        upcoming_contests = Contest.objects.filter(start_time__gt=current_time)
-
+        upcoming_contests = Contest.objects.filter(start_time__gte=current_time)
+        # past_contests = Contest.objects.filter(start_)
         # Serialize the contests
         active_serializer = ContestSerializer(active_contests, many=True)
         upcoming_serializer = ContestSerializer(upcoming_contests, many=True)
