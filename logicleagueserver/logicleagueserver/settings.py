@@ -173,9 +173,9 @@ LOGOUT_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgresql://ruddarm:PiZaSTcGxRy8GIVHM21b4kUDVxLVimEt@dpg-cv8j6krqf0us73b91tf0-a.oregon-postgres.render.com/logicleaguedatabase"
+        # default="postgresql://ruddarm:PiZaSTcGxRy8GIVHM21b4kUDVxLVimEt@dpg-cv8j6krqf0us73b91tf0-a.oregon-postgres.render.com/logicleaguedatabase"
         # default="postgresql://ruddarm:D05aQySKjpQZKOOwQCIcP8IYJfAgfKdI@dpg-cufql63tq21c73f8vhc0-a.oregon-postgres.render.com/logicleague_zmss"
-        
+       default=  "postgresql://logicleaguedatabase_i01h_user:khPxxm4wcmCQEf7zfx6EQYysuqoJnTkg@dpg-cvkm2q0gjchc73ceg640-a.oregon-postgres.render.com/logicleaguedatabase_i01h"
     )
 }
 

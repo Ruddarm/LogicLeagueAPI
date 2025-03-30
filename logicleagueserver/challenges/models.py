@@ -12,7 +12,6 @@ class Challenges(models.Model):
     challengeName  = models.CharField(max_length=200,null=False)
     challengeDesc = models.TextField(null=True)
     problemStatement = models.TextField(null=False)
-    
     inputFormat = models.TextField(null=True);
     outputFormat = models.TextField(null=True)
     constraints = models.TextField(null=True)

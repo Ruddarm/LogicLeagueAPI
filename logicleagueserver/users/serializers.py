@@ -5,7 +5,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogicLeagueUser
@@ -67,12 +66,11 @@ class UpdatePassSerializer(serializers.Serializer):
 
 class UpdateUsernameSerializer(serializers.Serializer):
     new_username = serializers.CharField(write_only=True, max_length=50)
-
     def validate_new_username(self, value):
         if LogicLeagueUser.objects.filter(username=value).exists():
             raise serializers.ValidationError("The username is already taken.")
         return value
-
+# \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
     def save(self, **kwargs):
         user = self.context['request'].user
         new_username = self.validated_data['new_username']

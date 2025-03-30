@@ -3,90 +3,97 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-
-
 from challenges.models import Challenges
 #from users.models import UserManager
-
 from django.db import models
 from django.utils import timezone
+import uuid
+from users.models import LogicLeagueUser
 #from django.contrib.auth.models import User
 
 class Contest(models.Model):
     # Unique ID
-    id = models.AutoField(primary_key=True)
-
-    # details
-    name = models.CharField(max_length=255, null=False, blank=False) 
-    description = models.TextField(null=False, blank=False)
-    start_time = models.DateTimeField(null=False, blank=False, default=timezone.now)
-    end_time = models.DateTimeField(null=False, blank=False, default=timezone.now) 
-    prizes = models.TextField(max_length=300, blank=True, null=True) 
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Details
+    name = models.CharField(max_length=255, null=False, blank=False)
+    description = models.TextField(null=True, blank=True)
+    start_time = models.DateTimeField(null=True, blank=True, default=timezone.now)
+    end_time = models.DateTimeField(null=True, blank=True)  # Default hata diya, user set karega
+    prizes = models.TextField(blank=True, null=True)
+    
     # Status
-    is_public = models.BooleanField(default=False) 
+    is_public = models.BooleanField(default=True)
 
-    #challenge = models.ForeignKey(Challenges, on_delete=models.CASCADE, related_name='contests')
+    # Relationships
+    created_by = models.ForeignKey(
+        LogicLeagueUser, 
+        on_delete=models.CASCADE, 
+        null=True,
+        related_name="created_contests"  # 👈 Better naming
+    )
 
-    # Array of participants
-    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='contests', blank=True)
+    participants = models.ManyToManyField(
+        LogicLeagueUser, 
+        related_name="joined_contests",  # 👈 Better naming
+        blank=True
+    )
+
+    challenges = models.ManyToManyField(
+        Challenges, 
+        related_name="contests"  # 👈 Plural form rakha
+    )
 
     def __str__(self):
         return self.name
     
-    '''@property
-    def is_active(self):
-        now = timezone.now()
-        return self.start_time <= now <= self.end_time'''
 
-
-
-'''
-    # uui contest id - done
-    # defuult value , not null validaiton - done
-    # prizes, - done
-    # isactve, is public ,  - done
-    # challegne foreign key .challemnge models
-    name = models.CharField(max_length=255, null= False)
-    description = models.TextField(null= False)
-    start_time = models.DateTimeField(null= False, default= timezone.now)
-    end_time = models.DateTimeField(null= False, default=timezone.now)
-    prizes = models.CharField(max_length=300)
-    # array of user id '''
+class ContestChallenge(models.Model):
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name="contest_challenges")
+    challenge = models.ForeignKey(Challenges, on_delete=models.CASCADE , null=True)
+    marks = models.IntegerField(default=0)  # Challenge ke marks
     
-# constest -reg model
-
-@login_required
-def register_for_contest(request, contest_id):
-    contest = get_object_or_404(Contest, id=contest_id)
-
-    if contest.is_active and contest.start_time > timezone.now():
-        contest.participants.add(request.user)
-        messages.success(request, f"You have successfully registered for the contest: {contest.name}.")
-    else:
-        messages.error(request, "Registration is closed or the contest has already started.")
-
-    return redirect('contest_detail', contest_id=contest.id) 
-# contest Id , user Id 
-
-class Problem(models.Model):
-    contest = models.ForeignKey(Contest, related_name='problems', on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    constraints = models.TextField()
-    test_cases = models.JSONField()  # Use a JSON field to store test cases
+    class Meta:
+        unique_together = ('contest', 'challenge')  # Ek contest me ek challenge sirf ek baar ho sakta hai
 
     def __str__(self):
-        return self.title
-# almost ok hia 
+        return f"{self.contest.name} - {self.challenge.title} ({self.marks} Marks)"
+
 class Submission(models.Model):
-    problem = models.ForeignKey(Problem, related_name='submissions', on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='submissions', on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(LogicLeagueUser, on_delete=models.CASCADE, related_name="submissions")
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name="submissions" , null=True)
+    challenge = models.ForeignKey(Challenges, on_delete=models.CASCADE, related_name="submissions", null=True, blank=True)
     code = models.TextField()
-    language = models.CharField(max_length=50)
-    status = models.CharField(max_length=50)  # e.g., "Accepted", "Wrong Answer"
-    execution_time = models.FloatField()
-    score = models.IntegerField()
+    status = models.CharField(max_length=50, choices=[
+        ('Accepted', 'Accepted'), 
+        ('Wrong Answer', 'Wrong Answer'),
+        ('TLE', 'Time Limit Exceeded'), 
+        ('Compilation Error', 'Compilation Error')
+    ], default='Compilation Error')
+    execution_time = models.FloatField(null=True, blank=True)
+    score = models.IntegerField(default=0)
+    submitted_at = models.DateTimeField(auto_now_add=True , null=True)
+class ContestLeaderboard(models.Model):
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name="leaderboard")
+    user = models.ForeignKey(LogicLeagueUser, on_delete=models.CASCADE)
+    total_score = models.IntegerField(default=0)
+    last_submission_time = models.DateTimeField(null=True, blank=True)  # 👈 Track karega ki user ne last submission kab kiya
+
+    class Meta:
+        unique_together = ('contest', 'user')  # Har user ek contest me ek hi bar store hoga
 
     def __str__(self):
-        return f"Submission by {self.user} for {self.problem}"
+        return f"{self.user.username} - Score: {self.total_score}, Last Submit: {self.last_submission_time}"
+
+
+def get_sorted_leaderboard(contest):
+    return ContestLeaderboard.objects.filter(contest=contest).order_by('-total_score', 'last_submission_time')
+
+def update_leaderboard(submission):
+    leaderboard_entry, created = ContestLeaderboard.objects.get_or_create(
+        contest=submission.contest, user=submission.user
+    )
+    # Best score leke update karna
+    leaderboard_entry.total_score = max(leaderboard_entry.total_score, submission.score)
+    leaderboard_entry.last_submission_time = submission.submitted_at
+    leaderboard_entry.save()
