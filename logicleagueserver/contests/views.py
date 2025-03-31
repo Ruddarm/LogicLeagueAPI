@@ -9,11 +9,16 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Contest,ContestChallenge
-from .serializers import ContestCreateSerializer, ContestEditSerializer , ContestChallengeSerializer
+from .serializers import ContestCreateSerializer, ContestEditSerializer , ContestChallengeSerializer , ContestListSerializer
 from django.shortcuts import get_object_or_404, render
 
 class ContestCreationView(APIView):
     permission_classes  = [IsAuthenticated]
+    def get(self,req,contest_id):
+        allContest = get_object_or_404(Contest,id=contest_id);
+        serializeData = ContestEditSerializer(allContest)
+        return Response(serializeData.data,status=status.HTTP_200_OK)
+
     def post(self,req):
         serializer = ContestCreateSerializer(data=req.data)
         if serializer.is_valid():
@@ -35,7 +40,14 @@ class ContestCreationView(APIView):
         
 class ContestChallengeManageView(APIView):
     permission_classes = [IsAuthenticated]
-
+    def get(self,request,contest_id):
+        print(contest_id)  # ✅ Debugging ke liye print
+        challenges_data = ContestChallenge.objects.filter(contest=contest_id).select_related('challenge')  
+        if not challenges_data.exists():  # ✅ QuerySet ka `.exists()` use kar
+            return Response({"error": "Contest not found or unauthorized"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ContestChallengeSerializer(challenges_data, many=True)  # ✅ `many=True` add kar
+        return Response(serializer.data, status=status.HTTP_200_OK)
+            # return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     def post(self, request, contest_id):
         """Add Challenge to Contest with Marks"""
         contest = Contest.objects.filter(id=contest_id, created_by=request.user).first()
@@ -56,3 +68,16 @@ class ContestChallengeManageView(APIView):
 
         contest_challenge.delete()
         return Response({"message": "Challenge removed from contest"}, status=status.HTTP_200_OK)
+
+class ContestListview(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        contestData = Contest.objects.all()
+        # print(contestData)
+        serializerData = ContestListSerializer(contestData,many=True)
+        print(serializerData)
+        return Response(
+            serializerData.data,status=status.HTTP_200_OK
+        )
+    
+ 

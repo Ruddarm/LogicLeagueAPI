@@ -5,8 +5,10 @@ urlpatterns = [
     # Public contest list
     # path('', views.contest_list, name='contest-list'),
     path('',views.ContestCreationView.as_view(), name='contestcreation'),
+    path('<slug:contest_id>/',views.ContestCreationView.as_view()),
     path('edit/<slug:contest_id>/', views.ContestCreationView.as_view(), name='contest-edit'),
     path('<uuid:contest_id>/challenges/',views.ContestChallengeManageView.as_view(), name='contest-challenge-manage'),
+    path("list/", views.ContestListview.as_view(), name=""),
     path('<uuid:contest_id>/challenges/<uuid:challenge_id>/remove/', views.ContestChallengeManageView.as_view(), name='contest-challenge-remove'),
     # Contest registration
     # path('contests/<int:contest_id>/register/', views.contest_registration, name='contest-registration'),

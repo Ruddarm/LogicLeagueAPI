@@ -20,6 +20,8 @@ class Contest(models.Model):
     start_time = models.DateTimeField(null=True, blank=True, default=timezone.now)
     end_time = models.DateTimeField(null=True, blank=True)  # Default hata diya, user set karega
     prizes = models.TextField(blank=True, null=True)
+    rules = models.TextField(null=True,blank=True)
+    scoring = models.TextField(null=True,blank=True)
     
     # Status
     is_public = models.BooleanField(default=True)
@@ -44,7 +46,7 @@ class Contest(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return 'fuck you'
     
 
 class ContestChallenge(models.Model):
