@@ -31,7 +31,6 @@ class ContestCreationView(APIView):
         contest = Contest.objects.filter(id=contest_id, created_by=request.user).first()
         if not contest:
             return Response({"error": "Contest not found or unauthorized"}, status=status.HTTP_404_NOT_FOUND)
-
         serializer = ContestEditSerializer(contest, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

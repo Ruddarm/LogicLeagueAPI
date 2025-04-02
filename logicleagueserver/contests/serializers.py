@@ -10,7 +10,7 @@ class ContestCreateSerializer(serializers.ModelSerializer):
 class ContestEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contest
-        fields = ['name', 'description', 'start_time', 'end_time', 'prizes' , "scoring","rules"]
+        fields = ['name', 'description', 'start_time', 'end_time', 'prizes' , "scoring","rules","id"]
         extra_kwargs = {'name': {'required': False}}  
         
 class ContestChallengeSerializer(serializers.ModelSerializer):
