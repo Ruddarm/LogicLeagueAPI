@@ -99,3 +99,14 @@ def update_leaderboard(submission):
     leaderboard_entry.total_score = max(leaderboard_entry.total_score, submission.score)
     leaderboard_entry.last_submission_time = submission.submitted_at
     leaderboard_entry.save()
+    
+    
+
+class ContestRegistration(models.Model):
+    user = models.ForeignKey(LogicLeagueUser, on_delete=models.CASCADE)
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+    registered_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'contest')  # duplicate registration avoid
+

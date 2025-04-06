@@ -13,7 +13,7 @@ class CreateChalllengeSerializer(serializers.ModelSerializer):
             
         }
     def create(self,validChallenge,user):
-        print("valid challenge",validChallenge)
+        # print("valid challenge",validChallenge)
         return Challenges.objects.create(createdBy=user,**validChallenge)
     
 class TestCaseSerializer(serializers.ModelSerializer):
@@ -73,3 +73,7 @@ class SolutionSerializer(serializers.ModelSerializer):
         instance.solution = validated_data.get('solution', instance.solution)
         instance.save()
         return instance
+class SearchChallengeSerializer ( serializers.ModelSerializer):
+    class Meta:
+        model = Challenges
+        fields = ["challengeID","challengeName"]

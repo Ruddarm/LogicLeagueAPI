@@ -1,7 +1,9 @@
 from django.urls import path,include
-from .views import challenge_admin_view , run_sollution,challenge_user_view,testcase_admin_view,get_test_case_view_terminal,get_test_case_view_desc , submit_submission , get_submission
+from .views import challenge_admin_view , run_sollution,challenge_user_view,testcase_admin_view,get_test_case_view_terminal,get_test_case_view_desc , submit_submission , get_submission , searchChallengeView
 
 urlpatterns = [
+    # search challenge
+    path("admin/search-challenge/",searchChallengeView),
     # create challenge by admin
     path("challenge/admin",challenge_admin_view.as_view(),name="challenge"),
     # update/delete challenge by admin

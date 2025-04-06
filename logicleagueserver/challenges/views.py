@@ -7,7 +7,7 @@ from .models import Challenges,TestCase , Solution
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import CreateChalllengeSerializer,TestCaseSerializer
+from .serializers import CreateChalllengeSerializer,TestCaseSerializer , SearchChallengeSerializer
 from .Containerpool import  container_pool
 from  .CodeExecution import run_code , submit_code
 
@@ -46,6 +46,7 @@ class challenge_admin_view(APIView):
             challenge_instance.delete()
             return Response({"msg":"Deleted Sucessfully"},status=status.HTTP_200_OK)
         return Response({"msg":"Invalid Challenge ID"},status=status.HTTP_400_BAD_REQUEST)
+    
     
 # Get Challenge data for users playground dispalay
 class challenge_user_view(APIView):
@@ -293,3 +294,16 @@ def get_submission(request,challengeID):
         
    
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def searchChallengeView(request):
+    querry = request.GET.get('search','')
+    if querry:
+        challengesData = Challenges.objects.filter(challengeName__icontains=querry)
+        serializer = SearchChallengeSerializer(challengesData, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response([], status=status.HTTP_200_OK)
+
+
